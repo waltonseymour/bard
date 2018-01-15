@@ -37,6 +37,7 @@ func main() {
 	})
 
 	r.HandleFunc("/balance", walletBalance)
+	r.HandleFunc("/invoice", addInvoice).Methods("POST")
 
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8000", r))
@@ -70,6 +71,20 @@ func walletBalance(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	writeJSON(w, balance)
+}
+
+func addInvoice(w http.ResponseWriter, r *http.Request) {
+	client, cleanup := getClient()
+	defer cleanup()
+
+	invoice, err := client.AddInvoice(context.Background(), &lnrpc.Invoice{
+		Value: 100,
+	})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	writeJSON(w, invoice)
 }
 
 func writeJSON(w http.ResponseWriter, v interface{}) {
