@@ -3,12 +3,39 @@ import './App.css';
 
 const logo = require('./logo.svg');
 
+const uuidv4 = require('uuid/v4');
+
+const getMessage = (method: string, value: string) => {
+  return JSON.stringify({
+    method,
+    value
+  });
+};
+
 class App extends React.Component {
 
   state = {
     paid: false
   };
-  
+
+  componentDidMount() {
+    let userID = window.localStorage.getItem('id') || '';
+
+    if (!userID) {
+      userID = uuidv4();
+      window.localStorage.setItem('id', userID);
+    }
+
+    const socket = new WebSocket('ws://localhost:8000/websocket');
+    socket.onmessage = (message) => {
+      console.log(message);
+    };
+    socket.onopen = () => {
+      // allows for pairing identiy with websocket
+      socket.send(getMessage('setUserID', userID));
+    };
+  }
+
   render() {
     let body;
 

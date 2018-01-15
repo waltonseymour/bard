@@ -36,6 +36,8 @@ func main() {
 		http.ServeFile(w, r, "./web/build/index.html")
 	})
 
+	r.HandleFunc("/websocket", websocketHandler)
+
 	r.HandleFunc("/balance", walletBalance)
 	r.HandleFunc("/invoice", addInvoice).Methods("POST")
 
@@ -71,6 +73,11 @@ func walletBalance(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	writeJSON(w, balance)
+
+	conn := webSocketMap["e76a1b58-0b60-4c37-b3ca-0842badbebb5"]
+
+	conn.WriteJSON(balance)
+
 }
 
 func addInvoice(w http.ResponseWriter, r *http.Request) {
