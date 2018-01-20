@@ -23,7 +23,7 @@ class App extends React.Component {
   };
 
   requestInvoice = () => {
-    fetch(`http://localhost:8000/invoice?userID=${this.userID}`, {
+    fetch(`/invoice?userID=${this.userID}`, {
       method: 'POST'
     }).then((response) => {
       return response.json();
@@ -43,7 +43,7 @@ class App extends React.Component {
       window.localStorage.setItem('id', this.userID);
     }
 
-    this.socket = new WebSocket('ws://localhost:8000/websocket');
+    this.socket = new WebSocket('ws://' + location.host + '/websocket');
     this.socket.onmessage = (message) => {
       this.setState({paid: true, paymentRequest: ''});
     };

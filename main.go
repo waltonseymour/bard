@@ -44,7 +44,7 @@ func main() {
 	createInvoiceListener()
 
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(":80", r))
 }
 
 func getClientConn() *grpc.ClientConn {
