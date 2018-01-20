@@ -65,6 +65,23 @@ func getClient() (lnrpc.LightningClient, func()) {
 	return lnrpc.NewLightningClient(conn), cleanUp
 }
 
+// func getInvoiceListener() {
+// 	client, cleanup := getClient()
+// 	defer cleanup()
+
+// 	subscriptionClient, err := client.SubscribeInvoices(context.Background(), &lnrpc.InvoiceSubscription{})
+// 	if err != nil {
+// 		log.Println(err)
+// 	}
+
+// 	go func() {
+// 		invoiceUpdate, err :=
+// 	}
+
+// 	subscriptionClient.
+
+// }
+
 func walletBalance(w http.ResponseWriter, r *http.Request) {
 	client, cleanup := getClient()
 	defer cleanup()
@@ -84,9 +101,13 @@ func addInvoice(w http.ResponseWriter, r *http.Request) {
 	client, cleanup := getClient()
 	defer cleanup()
 
+	userID := r.URL.RawQuery
+
 	invoice, err := client.AddInvoice(context.Background(), &lnrpc.Invoice{
 		Value: 100,
 	})
+
+	invoiceMap[invoice.PaymentRequest] = userID
 
 	if err != nil {
 		fmt.Println(err)

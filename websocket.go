@@ -13,6 +13,9 @@ var upgrader = websocket.Upgrader{}
 var purchaedMap = make(map[string]bool)
 var webSocketMap = make(map[string]*websocket.Conn)
 
+// map of payment request to userID
+var invoiceMap = make(map[string]string)
+
 type webSocketRequest struct {
 	Method string `json:"method"`
 	Value  string `json:"value"`
@@ -35,7 +38,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 	defer c.Close()
 
 	for {
-		mt, message, err := c.ReadMessage()
+		_, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
 			break
@@ -47,12 +50,6 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		if request.Method == "setUserID" {
 			setUserID(request.Value, c)
-		}
-
-		err = c.WriteMessage(mt, message)
-		if err != nil {
-			log.Println("write:", err)
-			break
 		}
 	}
 }

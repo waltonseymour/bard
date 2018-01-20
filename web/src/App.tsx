@@ -14,30 +14,48 @@ const getMessage = (method: string, value: string) => {
 
 class App extends React.Component {
 
+  socket: WebSocket;
+  userID: string;
+
   state = {
-    paid: false
+    paid: false,
+    paymentRequest: undefined,
   };
 
-  componentDidMount() {
-    let userID = window.localStorage.getItem('id') || '';
+  requestInvoice = () => {
+    fetch(`http://localhost:8000/invoice?userID=${this.userID}`, {
+      method: 'POST'
+    }).then((response) => {
+      return response.json();
+    }).then((data) => {
+      console.log(data);
+      this.setState({ paymentRequest: data.payment_request });
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
 
-    if (!userID) {
-      userID = uuidv4();
-      window.localStorage.setItem('id', userID);
+  componentDidMount() {
+    this.userID = window.localStorage.getItem('id') || '';
+
+    if (!this.userID) {
+      this.userID = uuidv4();
+      window.localStorage.setItem('id', this.userID);
     }
 
-    const socket = new WebSocket('ws://localhost:8000/websocket');
-    socket.onmessage = (message) => {
-      console.log(message);
+    this.socket = new WebSocket('ws://localhost:8000/websocket');
+    this.socket.onmessage = (message) => {
+      this.setState({paid: true});
     };
-    socket.onopen = () => {
+    this.socket.onopen = () => {
       // allows for pairing identiy with websocket
-      socket.send(getMessage('setUserID', userID));
+      this.socket.send(getMessage('setUserID', this.userID));
     };
   }
 
   render() {
     let body;
+    let paymentRequest;
 
     if (this.state.paid) {
       body = (
@@ -47,7 +65,14 @@ class App extends React.Component {
           src="https://www.youtube.com/embed/1JlRWdNAi7I?rel=0&amp;showinfo=0"
         />);
     } else {
-      body = <button onClick={() => this.setState({paid: true})} >Pay</button>;
+      body = <button onClick={this.requestInvoice} >Pay</button>;
+    }
+
+    if (this.state.paymentRequest) {
+      paymentRequest = (
+      <div className="payment-request">
+        {this.state.paymentRequest}
+      </div>);
     }
 
     return (
@@ -57,6 +82,7 @@ class App extends React.Component {
           <h1 className="App-title">Bard</h1>
         </header>
         {body}
+        {paymentRequest}
       </div>
     );
   }
