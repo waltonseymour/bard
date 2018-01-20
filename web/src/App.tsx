@@ -45,7 +45,7 @@ class App extends React.Component {
 
     this.socket = new WebSocket('ws://localhost:8000/websocket');
     this.socket.onmessage = (message) => {
-      this.setState({paid: true});
+      this.setState({paid: true, paymentRequest: ''});
     };
     this.socket.onopen = () => {
       // allows for pairing identiy with websocket

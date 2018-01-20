@@ -41,6 +41,8 @@ func main() {
 	r.HandleFunc("/balance", walletBalance)
 	r.HandleFunc("/invoice", addInvoice).Methods("POST")
 
+	createInvoiceListener()
+
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
@@ -65,22 +67,29 @@ func getClient() (lnrpc.LightningClient, func()) {
 	return lnrpc.NewLightningClient(conn), cleanUp
 }
 
-// func getInvoiceListener() {
-// 	client, cleanup := getClient()
-// 	defer cleanup()
+func createInvoiceListener() {
+	// do not clean up
+	client, _ := getClient()
 
-// 	subscriptionClient, err := client.SubscribeInvoices(context.Background(), &lnrpc.InvoiceSubscription{})
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-
-// 	go func() {
-// 		invoiceUpdate, err :=
-// 	}
-
-// 	subscriptionClient.
-
-// }
+	subscriptionClient, err := client.SubscribeInvoices(context.Background(), &lnrpc.InvoiceSubscription{})
+	if err != nil {
+		log.Fatalf("unable to subscribe to invoice updates: %v", err)
+	}
+	go func() {
+		invoiceUpdate, err := subscriptionClient.Recv()
+		if err != nil {
+			log.Fatalf("unable to recieve to invoice updates: %v", err)
+		}
+		if invoiceUpdate != nil && invoiceUpdate.Settled {
+			userID := invoiceMap[invoiceUpdate.PaymentRequest]
+			socket := webSocketMap[userID]
+			if socket != nil {
+				setPurchased(userID)
+				socket.WriteJSON("Paid")
+			}
+		}
+	}()
+}
 
 func walletBalance(w http.ResponseWriter, r *http.Request) {
 	client, cleanup := getClient()
@@ -90,18 +99,13 @@ func walletBalance(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	writeJSON(w, balance)
-
-	conn := webSocketMap["e76a1b58-0b60-4c37-b3ca-0842badbebb5"]
-
-	conn.WriteJSON(balance)
-
 }
 
 func addInvoice(w http.ResponseWriter, r *http.Request) {
 	client, cleanup := getClient()
 	defer cleanup()
 
-	userID := r.URL.RawQuery
+	userID := r.URL.Query().Get("userID")
 
 	invoice, err := client.AddInvoice(context.Background(), &lnrpc.Invoice{
 		Value: 100,

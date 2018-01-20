@@ -10,7 +10,7 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
-var purchaedMap = make(map[string]bool)
+var purchasedMap = make(map[string]bool)
 var webSocketMap = make(map[string]*websocket.Conn)
 
 // map of payment request to userID
@@ -22,7 +22,7 @@ type webSocketRequest struct {
 }
 
 func setPurchased(userID string) {
-	purchaedMap[userID] = true
+	purchasedMap[userID] = true
 }
 
 func setUserID(userID string, ws *websocket.Conn) {
@@ -49,6 +49,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(message, &request)
 
 		if request.Method == "setUserID" {
+			log.Printf("User connected with ID %s", request.Value)
 			setUserID(request.Value, c)
 		}
 	}
