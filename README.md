@@ -1,3 +1,3 @@
 # Bard
 
-A entertainment platform built on bitcoin.
+An entertainment platform built on bitcoin.
