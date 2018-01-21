@@ -108,6 +108,7 @@ func addInvoice(w http.ResponseWriter, r *http.Request) {
 	userID := r.URL.Query().Get("userID")
 
 	invoice, err := client.AddInvoice(context.Background(), &lnrpc.Invoice{
+		Memo:  "Bard Invoice",
 		Value: 100,
 	})
 
