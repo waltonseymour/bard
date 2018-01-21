@@ -43,7 +43,7 @@ class App extends React.Component {
       window.localStorage.setItem('id', this.userID);
     }
 
-    this.socket = new WebSocket('ws://' + location.host + '/websocket');
+    this.socket = new WebSocket('wss://' + location.host + '/websocket');
     this.socket.onmessage = (message) => {
       this.setState({paid: true, paymentRequest: ''});
     };

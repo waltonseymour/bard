@@ -42,7 +42,8 @@ func main() {
 	createInvoiceListener()
 
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":80", r))
+	log.Fatal(http.ListenAndServeTLS(":443", "/etc/letsencrypt/live/www.bard.fun/fullchain.pem",
+		"/etc/letsencrypt/live/www.bard.fun/privkey.pem", r))
 }
 
 func getClientConn() *grpc.ClientConn {
