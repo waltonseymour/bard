@@ -75,18 +75,20 @@ func createInvoiceListener() {
 		log.Fatalf("unable to subscribe to invoice updates: %v", err)
 	}
 	go func() {
-		invoiceUpdate, err := subscriptionClient.Recv()
-		if err != nil {
-			log.Fatalf("unable to recieve to invoice updates: %v", err)
-		}
-		if invoiceUpdate != nil && invoiceUpdate.Settled {
-			userID := invoiceMap[invoiceUpdate.PaymentRequest]
-			socket := webSocketMap[userID]
-			log.Printf("Payment recieved for userID %s", userID)
-			if socket != nil {
-				log.Printf("Sending payment notice to userID %s", userID)
-				setPurchased(userID)
-				socket.WriteJSON("Paid")
+		for {
+			invoiceUpdate, err := subscriptionClient.Recv()
+			if err != nil {
+				log.Fatalf("unable to recieve to invoice updates: %v", err)
+			}
+			if invoiceUpdate != nil && invoiceUpdate.Settled {
+				userID := invoiceMap[invoiceUpdate.PaymentRequest]
+				socket := webSocketMap[userID]
+				log.Printf("Payment recieved for userID %s", userID)
+				if socket != nil {
+					log.Printf("Sending payment notice to userID %s", userID)
+					setPurchased(userID)
+					socket.WriteJSON("Paid")
+				}
 			}
 		}
 	}()
