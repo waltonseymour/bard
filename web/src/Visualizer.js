@@ -1,3 +1,5 @@
+// @flow
+
 export default class Visualizer {
     HEIGHT: number;
     WIDTH: number;

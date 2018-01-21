@@ -12,14 +12,19 @@ const getMessage = (method: string, value: string) => {
   });
 };
 
-class App extends React.Component {
+type State = {
+  paid: boolean,
+  paymentRequest: string,
+}
+
+class App extends React.Component<void, State> {
 
   socket: WebSocket;
   userID: string;
 
   state = {
     paid: false,
-    paymentRequest: undefined,
+    paymentRequest: "",
   };
 
   requestInvoice = () => {
@@ -68,7 +73,7 @@ class App extends React.Component {
       body = <button onClick={this.requestInvoice} >Pay</button>;
     }
 
-    if (this.state.paymentRequest) {
+    if (this.state.paymentRequest === '') {
       paymentRequest = (
       <div className="payment-request">
         {this.state.paymentRequest}
