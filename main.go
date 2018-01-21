@@ -35,10 +35,14 @@ func main() {
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./web/build/index.html")
 	})
+	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/build/favicon.ico")
+	})
 
 	r.HandleFunc("/websocket", websocketHandler)
 	r.HandleFunc("/invoice", addInvoice).Methods("POST")
 
+	// listens for payments
 	createInvoiceListener()
 
 	http.Handle("/", r)
