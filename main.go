@@ -37,8 +37,6 @@ func main() {
 	})
 
 	r.HandleFunc("/websocket", websocketHandler)
-
-	r.HandleFunc("/balance", walletBalance)
 	r.HandleFunc("/invoice", addInvoice).Methods("POST")
 
 	createInvoiceListener()
@@ -83,7 +81,9 @@ func createInvoiceListener() {
 		if invoiceUpdate != nil && invoiceUpdate.Settled {
 			userID := invoiceMap[invoiceUpdate.PaymentRequest]
 			socket := webSocketMap[userID]
+			log.Printf("Payment recieved for userID %s", userID)
 			if socket != nil {
+				log.Printf("Sending payment notice to userID %s", userID)
 				setPurchased(userID)
 				socket.WriteJSON("Paid")
 			}
