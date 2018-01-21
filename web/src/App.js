@@ -73,7 +73,7 @@ class App extends React.Component<void, State> {
       body = <button onClick={this.requestInvoice} >Pay</button>;
     }
 
-    if (this.state.paymentRequest === '') {
+    if (this.state.paymentRequest !== '') {
       paymentRequest = (
       <div className="payment-request">
         {this.state.paymentRequest}
