@@ -1,7 +1,7 @@
+// @flow
+
 import * as React from 'react';
 import './App.css';
-
-const logo = require('./logo.svg');
 
 const uuidv4 = require('uuid/v4');
 
@@ -43,7 +43,7 @@ class App extends React.Component {
       window.localStorage.setItem('id', this.userID);
     }
 
-    this.socket = new WebSocket('wss://' + location.host + '/websocket');
+    this.socket = new WebSocket('wss://' + window.location.host + '/websocket');
     this.socket.onmessage = (message) => {
       this.setState({paid: true, paymentRequest: ''});
     };
@@ -78,7 +78,6 @@ class App extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Bard</h1>
         </header>
         {body}
