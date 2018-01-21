@@ -79,9 +79,9 @@ class App extends React.Component<void, State> {
     let paymentRequest;
 
     if (this.state.paid) {
-      body = <canvas height={600} width={800} id="canvas" />;
+      body = <canvas height={600} width={800} id="canvas"/>;
     } else {
-      body = <button onClick={this.requestInvoice} >Pay</button>;
+      body = <button onClick={this.requestInvoice} >Please pay $0.01</button>;
     }
 
     if (this.state.paymentRequest !== '') {
